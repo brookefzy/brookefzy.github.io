@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Map Change over time</title>
+
+
+<meta charset='utf-8' />
+<title>US Immi & Entre</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+</head>
+
+
+
+<body>
+<div id='map'></div>
+<style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, Sans-serif;
+    }
+    
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 50px;
+      width: 100%;
+      height: 100%
+    }
+    
+    h1 {
+      font-size: 20px;
+      line-height: 30px;
+    }
+    
+    h2 {
+      font-size: 14px;
+      line-height: 20px;
+      margin-bottom: 10px;
+    }
+    
+    a {
+      text-decoration: none;
+      color: #2dc4b2;
+    }
+    
+    #console {
+      position: absolute;
+      width: 240px;
+      height:500px;
+      margin: 10px;
+      padding: 10px 20px;
+      background-color: white;
+    }
+    .session {
+      margin-bottom: 20px;
+    }
+    
+    .row {
+      height: 12px;
+      width: 100%;
+    }
+    
+    .colors {
+      background: linear-gradient(to right, #EDC951, #CC333F, #00A0B0);
+      margin-bottom: 5px;
+    }
+    
+    .label {
+      width: 15%;
+      display: inline-block;
+      text-align: center;
+    }
+    .mapboxgl-popup-content{
+                background:black;
+                fill-opacity: 0.5;
+                color: #fff;
+                margin: 0;
+                display: block;
+                padding: 10px;
+                font-weight: 700;
+                margin-top: -15px;
+                max-width: 200px;
+    }
+    
+    </style>
+<div id='console'>
+  <h1>Kaufman Data</h1>
+  <p>Data: <a href='https://www.kauffman.org/'>Immigrants & Entrepreneurship</a> in the US, 2008-2017</p>
+  
+  <!-- adding legend -->
+  <!-- <div class='session'>
+    <h2>Percentage</h2>
+    <div class='row colors'>
+    </div>
+
+    <div class='row labels'> 
+      <div class='label'>0</div>
+      <div class='label'>0.5</div>
+      <div class='label'>1</div>
+      <div class='label'>1.5</div>
+      <div class='label'>2</div>
+      <div class='label'>3</div>
+    </div>
+      
+  </div> -->
+
+  <!-- adding slidebar -->
+  <div class='session' id='sliderbar'>
+    <h2>Year: <label id='active-year'>2017</label></h2>
+    <input id='slider' class='row' type='range' min='2008' max='2017' step='1' value='2017' />
+</div>
+
+<!-- adding radio button -->
+<div class='session'>
+    <h2>Entrepreneurship & Immigrant Share</h2>
+    <div class='row' id='filters'>
+        <p><input id='all' type='radio' name='toggle' value='all' checked='checked'>
+        <label for='all'>All</label></p>
+        <p><input id='IMMIGRate' type='radio' name='toggle' value='IMMIGRate'>
+      <label for='IMMIGRate'>Immigrant Rate</label></p>
+      <p><input id='EntreRate' type='radio' name='toggle' value='EntreRate'>
+      <label for='EntreRate'>Entrepreneurship Rate</label></p>
+      <p><input id='ImmigOwnEntreRate' type='radio' name='toggle' value='ImmigOwnEntreRate'>
+      <label for='ImmigOwnEntreRate'>Percentage of Immigrant-owned Business</label></p>
+    </div>
+  </div>
+  
+</div>
+
+<script src = "/js/map_metro.js"></script>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiYnJvb2tlZnp5IiwiYSI6ImNqdWFtZHNmdTA0N3o0M21oZG9peDU2NXMifQ.fbFnwmA72jGPO8IHcfEeRA';
+
+var map = new mapboxgl.Map({
+  container: 'map', // container element id
+  style: 'mapbox://styles/mapbox/dark-v10',
+  center: [-95.9345, 41.2565],
+    zoom: 4,
+    minZoom: 3,
+    maxZoom: 100,
+});
+
+map.on('load', function() {
+    var filterYear = ['==', ['number', ['get', 'year']], 2017];
+    var filterVari = ['!=', ['string', ['get', 'variable']], 'placeholder'];
+
+    map.addSource("metroImmi", {
+    type: "geojson",
+// Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
+// from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
+    data: "https://raw.githubusercontent.com/TianyuSu/Innovation-Immigration/master/Geojson/metroImmi10year.geojson",
+});
+
+  map.addLayer({
+    id: 'ImmiEntre',
+    type: 'circle',
+    source: "metroImmi",
+    paint: {
+        "circle-stroke-width": 0.8,
+       'circle-radius': [
+        'interpolate',
+        ['linear'],
+        ['number', ['get', 'RATE']],
+        0, 1,
+        1, 8,
+        2, 13,
+        3, 16,
+        4, 19,
+        5, 22
+      ],
+    "circle-stroke-color":
+    [
+        'interpolate',
+        ['linear'],
+        ['number', ['get', 'variableC']],
+        1,'#AA5E79',  //     "IMMIGRate"
+        2, '#00A0B0',  //    "EntreRate"
+        3, '#EDC951' //     "ImmigOwnEntreRate"
+      ],
+
+    'circle-opacity': 0
+    },
+    filter:['all',filterYear, filterVari]
+  });
+ 
+  ///////interaction for the slide bar//////////////////////////////////////////////////// 
+  document.getElementById('slider').addEventListener('input', function(e) {
+  var year = parseInt(e.target.value);
+  // update the map
+  filterYear = ['==', ['number', ['get', 'year']], year];
+  map.setFilter('ImmiEntre', ['all',filterYear, filterVari]);
+
+  // update text in the UI
+  document.getElementById('active-year').innerText = year;
+});
+
+// /adding interactive for the radio button///////////////////////////////////////////////////
+
+document.getElementById('filters').addEventListener('change', function(e) {
+  var ratevariables = e.target.value;
+  // update the map filter
+  if(ratevariables === 'all'){
+    filterVari = ['!=', ['string', ['get', 'variable']], 'placeholder'];
+  }else if (ratevariables === "IMMIGRate") {
+    filterVari = ['match', ['get', 'variable'], ["EntreRate","ImmigOwnEntreRate"], false,true];
+  } else if (ratevariables === 'EntreRate') {
+    filterVari = ['match', ['get', 'variable'], ["IMMIGRate","ImmigOwnEntreRate"], false, true];
+  } else if (ratevariables === "ImmigOwnEntreRate") {
+    filterVari = ['match', ['get', 'variable'], ["EntreRate","IMMIGRate"], false, true];
+  } else {
+    console.log('error');
+  }
+  map.setFilter('ImmiEntre', ['all', filterYear, filterVari]);
+});
+
+///////adding popup/////////////////////////////////////////////////////////////////////////
+var popup = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+    });
+map.on('mouseenter', 'ImmiEntre', function(e) {
+// Change the cursor style as a UI indicator.
+map.getCanvas().style.cursor = 'pointer';
+ 
+var coordinates = e.features[0].geometry.coordinates.slice();
+var description = "In " +e.features[0].properties.year+" ,"+ e.features[0].properties.NAME + ", " + (Math.floor(e.features[0].properties.RATE*100)/100)+ "% of business owners are immigrants";
+ 
+// Ensure that if the map is zoomed out such that multiple
+// copies of the feature are visible, the popup appears
+// over the copy being pointed to.
+while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+}
+
+
+// Populate the popup and set its coordinates
+// based on the feature found.
+popup.setLngLat(coordinates)
+.setHTML(description)
+.addTo(map);
+});
+
+map.on('mouseleave', 'ImmiEntre', function() {
+map.getCanvas().style.cursor = '';
+popup.remove();
+});
+
+map.easeTo({
+    center: features[0].geometry.coordinates,
+    zoom: zoom
+});
+  ////////////////////////////////////////////////////////////////////
+});
+
+
+</script>
+</body>
+
+</html>

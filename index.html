@@ -2,7 +2,7 @@
 <html>
 <head>
 
-<title>Map Change over time</title>
+<title>Geography of Entrepreneurship & Immigration in the US</title>
 
 
 <meta charset='utf-8' />
@@ -50,23 +50,21 @@
     #console {
       position: absolute;
       width: 240px;
-      height:500px;
+      height:550px;
       margin: 10px;
       padding: 10px 20px;
-      background-color: white;
+      line-height: 18px;
+      background-color:rgba(0, 0, 0, 0.6);
+      color: white;
+      
     }
     .session {
       margin-bottom: 20px;
     }
     
     .row {
-      height: 12px;
-      width: 100%;
-    }
-    
-    .colors {
-      background: linear-gradient(to right, #EDC951, #CC333F, #00A0B0);
-      margin-bottom: 5px;
+      height: 50px;
+      width: 100%
     }
     
     .label {
@@ -74,6 +72,7 @@
       display: inline-block;
       text-align: center;
     }
+
     .mapboxgl-popup-content{
                 background:black;
                 fill-opacity: 0.5;
@@ -88,44 +87,28 @@
     
     </style>
 <div id='console'>
-  <h1>Kaufman Data</h1>
-  <p>Data: <a href='https://www.kauffman.org/'>Immigrants & Entrepreneurship</a> in the US, 2008-2017</p>
+  <h1>Geography of Entrepreneurship & Immigration in the US</h1>
+  <p>Data:</p> 
+  <p><a href='https://indicators.kauffman.org/'>Kauffman Data of Entrepreneurship</a> in the US, 2008 - 2017</p>
   
-  <!-- adding legend -->
-  <!-- <div class='session'>
-    <h2>Percentage</h2>
-    <div class='row colors'>
-    </div>
-
-    <div class='row labels'> 
-      <div class='label'>0</div>
-      <div class='label'>0.5</div>
-      <div class='label'>1</div>
-      <div class='label'>1.5</div>
-      <div class='label'>2</div>
-      <div class='label'>3</div>
-    </div>
-      
-  </div> -->
-
-  <!-- adding slidebar -->
+<!-- adding slidebar -->
   <div class='session' id='sliderbar'>
     <h2>Year: <label id='active-year'>2017</label></h2>
     <input id='slider' class='row' type='range' min='2008' max='2017' step='1' value='2017' />
 </div>
 
-<!-- adding radio button -->
+<!-- adding radio button & legend -->
 <div class='session'>
     <h2>Entrepreneurship & Immigrant Share</h2>
     <div class='row' id='filters'>
-        <p><input id='all' type='radio' name='toggle' value='all' checked='checked'>
-        <label for='all'>All</label></p>
-        <p><input id='IMMIGRate' type='radio' name='toggle' value='IMMIGRate'>
-      <label for='IMMIGRate'>Immigrant Rate</label></p>
+      <p><input id='all' type='radio' name='toggle' value='all' checked='checked'>
+      <label for='all'>All</label></p>
+      <p><input id='IMMIGRate' type='radio' name='toggle' value='IMMIGRate'>
+      <label for='IMMIGRate'><span style="color:#AA5E79">% Immigrant Rate</span></label></p>
       <p><input id='EntreRate' type='radio' name='toggle' value='EntreRate'>
-      <label for='EntreRate'>Entrepreneurship Rate</label></p>
+      <label for='EntreRate'><span style="color:#00A0B0">% Entrepreneurship</span></label></p>
       <p><input id='ImmigOwnEntreRate' type='radio' name='toggle' value='ImmigOwnEntreRate'>
-      <label for='ImmigOwnEntreRate'>Percentage of Immigrant-owned Business</label></p>
+      <label for='ImmigOwnEntreRate'><span style="color:#EDC951">% Immigrant-owned Business</span></label></p>
     </div>
   </div>
   
@@ -139,9 +122,9 @@ var map = new mapboxgl.Map({
   container: 'map', // container element id
   style: 'mapbox://styles/mapbox/dark-v10',
   center: [-95.9345, 41.2565],
-    zoom: 4,
-    minZoom: 3,
-    maxZoom: 100,
+  zoom: 4,
+  minZoom: 3,
+  maxZoom: 100,
 });
 
 map.on('load', function() {
@@ -160,7 +143,7 @@ map.on('load', function() {
     type: 'circle',
     source: "metroImmi",
     paint: {
-        "circle-stroke-width": 0.8,
+        // "circle-stroke-width": 0.8,
        'circle-radius': [
         'interpolate',
         ['linear'],
@@ -172,9 +155,9 @@ map.on('load', function() {
         4, 19,
         5, 22
       ],
-    "circle-stroke-color":
-    [
-        'interpolate',
+
+      "circle-color":
+    ['interpolate',
         ['linear'],
         ['number', ['get', 'variableC']],
         1,'#AA5E79',  //     "IMMIGRate"
@@ -182,12 +165,12 @@ map.on('load', function() {
         3, '#EDC951' //     "ImmigOwnEntreRate"
       ],
 
-    'circle-opacity': 0
+    'circle-opacity': 0.4
     },
     filter:['all',filterYear, filterVari]
   });
  
-  ///////interaction for the slide bar//////////////////////////////////////////////////// 
+  ///////INTERACTIVE: SLIDE BAR//////////////////////////////////////////////////// 
   document.getElementById('slider').addEventListener('input', function(e) {
   var year = parseInt(e.target.value);
   // update the map
@@ -198,8 +181,7 @@ map.on('load', function() {
   document.getElementById('active-year').innerText = year;
 });
 
-// /adding interactive for the radio button///////////////////////////////////////////////////
-
+/////INTERACTIVE: RADIO BUTTON///////////////////////////////////////////////////
 document.getElementById('filters').addEventListener('change', function(e) {
   var ratevariables = e.target.value;
   // update the map filter
@@ -217,13 +199,13 @@ document.getElementById('filters').addEventListener('change', function(e) {
   map.setFilter('ImmiEntre', ['all', filterYear, filterVari]);
 });
 
-///////adding popup/////////////////////////////////////////////////////////////////////////
+///////INTERACTIVE: POPUP////////////////////////////////////////////////////////////////////////
 var popup = new mapboxgl.Popup({
     closeButton: false,
     closeOnClick: false
     });
 map.on('mouseenter', 'ImmiEntre', function(e) {
-// Change the cursor style as a UI indicator.
+///////Change the cursor style as a UI indicator/////////////////////////////////////////////////
 map.getCanvas().style.cursor = 'pointer';
  
 var coordinates = e.features[0].geometry.coordinates.slice();
@@ -253,8 +235,10 @@ map.easeTo({
     center: features[0].geometry.coordinates,
     zoom: zoom
 });
-  ////////////////////////////////////////////////////////////////////
+
 });
+
+
 
 
 </script>

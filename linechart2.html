@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/css/linechart.css">
+    <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+
+</head>
+<body bgcolor = "#030d19">
+<div class="chart-wrapper" id="chart-line1">
+
+<script type="text/javascript">
+    d3.csv('https://raw.githubusercontent.com/TianyuSu/Innovation-Immigration/master/Data%20For%20Maps/Immi_Entre_year.csv', function(error, data) {
+    data.forEach(function (d) {
+        d.year = +d.Year;
+        d.ImmiEntreRate = +d.ImmiEntreRate;
+        d.EntreRate = +d.EntreRate;
+        d.ImmiRate = +d.ImmiRate;
+    });
+
+    var chart = makeLineChart(data, 'year', {
+        'ImmiEntreRate': {column: 'ImmiEntreRate'},
+        'EntreRate': {column: 'EntreRate'},
+        'ImmiRate': {column: 'ImmiRate'},
+
+    }, {xAxis: 'Years', yAxis: 'Percentage'});
+    chart.bind("#chart-line1");
+    chart.render();
+
+});
+</script>
+<script src="/js/multiline.js" charset="utf-8"></script>
+</div>
+</body>
+</html>

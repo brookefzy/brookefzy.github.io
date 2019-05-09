@@ -6,7 +6,6 @@ var map = new mapboxgl.Map({
     zoom: 4,
     minZoom: 3,
     maxZoom: 100,
-    pitch: 45
     });
 
     var hoveredStateId =  null;

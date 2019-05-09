@@ -104,7 +104,7 @@
       <p><input id='all' type='radio' name='toggle' value='all' checked='checked'>
       <label for='all'>All</label></p>
       <p><input id='IMMIGRate' type='radio' name='toggle' value='IMMIGRate'>
-      <label for='IMMIGRate'><span style="color:#AA5E79">% Immigrant Rate</span></label></p>
+      <label for='IMMIGRate'><span style="color:#AA5E79">% Immigrant</span></label></p>
       <p><input id='EntreRate' type='radio' name='toggle' value='EntreRate'>
       <label for='EntreRate'><span style="color:#00A0B0">% Entrepreneurship</span></label></p>
       <p><input id='ImmigOwnEntreRate' type='radio' name='toggle' value='ImmigOwnEntreRate'>
@@ -133,8 +133,6 @@ map.on('load', function() {
 
     map.addSource("metroImmi", {
     type: "geojson",
-// Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
-// from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
     data: "https://raw.githubusercontent.com/TianyuSu/Innovation-Immigration/master/Geojson/metroImmi10year.geojson",
 });
 
@@ -143,7 +141,6 @@ map.on('load', function() {
     type: 'circle',
     source: "metroImmi",
     paint: {
-        // "circle-stroke-width": 0.8,
        'circle-radius': [
         'interpolate',
         ['linear'],
@@ -217,7 +214,6 @@ var description = "In " +e.features[0].properties.year+" ,"+ e.features[0].prope
 while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 }
-
 
 // Populate the popup and set its coordinates
 // based on the feature found.

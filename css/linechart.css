@@ -1,6 +1,6 @@
 .chart-wrapper {
-    max-width: 950px;
-    min-width: 304px;
+    max-width: 300px;
+    min-width: 50px;
     margin: 0 auto;
     background-color:#030d19;
 }
@@ -53,7 +53,7 @@
 }
 
 .chart-wrapper .legend  {
-    min-width: 200px;
+    min-width: 150px;
     display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;

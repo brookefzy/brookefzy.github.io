@@ -1,7 +1,7 @@
 function makeLineChart(dataset, xName, yObjs, axisLables) {
     var chartObj = {};
     // var color = d3.scale.category10();
-    var color = d3.scale.ordinal().domain(["ImmiEntreRate","EntreRate","ImmiRate"]).range(['#AA5E79','#00A0B0','#EDC951']);
+    var color = d3.scale.ordinal().domain(["ImmiEntreRate","NativeEntreRate","EntreRate"]).range(['#EDC951','#00A0B0','#AA5E79']);//'#AA5E79'
 
     chartObj.xAxisLable = axisLables.xAxis;
     chartObj.yAxisLable = axisLables.yAxis;
@@ -11,8 +11,8 @@ function makeLineChart(dataset, xName, yObjs, axisLables) {
      */
 
     chartObj.data = dataset;
-    chartObj.margin = {top: 5, right: 5, bottom: 5, left: 5};
-    chartObj.width = 270 - chartObj.margin.left - chartObj.margin.right;
+    chartObj.margin = {top: 0, right: 0, bottom: 0, left: 0};
+    chartObj.width = 300 - chartObj.margin.left - chartObj.margin.right;
     chartObj.height = 200 - chartObj.margin.top - chartObj.margin.bottom;
 
 // So we can pass the x and y as strings when creating the function
@@ -176,13 +176,13 @@ function makeLineChart(dataset, xName, yObjs, axisLables) {
         focus.append("line").attr("class", "focus line").attr("y1", 0).attr("y2", chartObj.height);
 
         //Draw legend
-        var legend = chartObj.mainDiv.append('div').attr("class", "legend");
-        for (var y  in yObjs) {
-            series = legend.append('div');
-            series.append('div').attr("class", "series-marker").style("background-color", color(y));
-            series.append('p').text(y);
-            yObjs[y].legend = series;
-        }
+        // var legend = chartObj.mainDiv.append('div').attr("class", "legend");
+        // for (var y  in yObjs) {
+        //     series = legend.append('div');
+        //     series.append('div').attr("class", "series-marker").style("background-color", color(y));
+        //     series.append('p').text(y);
+        //     yObjs[y].legend = series;
+        // }
 
         // Overlay to capture hover
         chartObj.svg.append("rect").attr("class", "overlay")

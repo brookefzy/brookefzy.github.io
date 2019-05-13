@@ -87,33 +87,36 @@
     
     </style>
 <div id='console'>
-  <h1>Geography of Entrepreneurship & Immigration in the US</h1>
-  <p>Data:</p> 
-  <p><a href='https://indicators.kauffman.org/'>Kauffman Data of Entrepreneurship</a> in the US, 2008 - 2017</p>
-  
-<!-- adding slidebar -->
-  <div class='session' id='sliderbar'>
-    <h2>Year: <label id='active-year'>2017</label></h2>
-    <input id='slider' class='row' type='range' min='2004' max='2017' step='1' value='2017' />
-</div>
-
-<!-- adding radio button & legend -->
-<div class='session'>
-    <h2>Entrepreneurship & Immigrant Share</h2>
-    <div class='row' id='filters'>
-      <p><input id='all' type='radio' name='toggle' value='all' checked='checked'>
-      <label for='all'>All</label></p>
-      <p><input id='IMMIGRate' type='radio' name='toggle' value='IMMIGRate'>
-      <label for='IMMIGRate'><span style="color:#AA5E79">% Immigrant</span></label></p>
-      <p><input id='EntreRate' type='radio' name='toggle' value='EntreRate'>
-      <label for='EntreRate'><span style="color:#00A0B0">% Entrepreneurship</span></label></p>
-      <p><input id='ImmigOwnEntreRate' type='radio' name='toggle' value='ImmigOwnEntreRate'>
-      <label for='ImmigOwnEntreRate'><span style="color:#EDC951">% Immigrant-owned Business</span></label></p>
+    <h1>Geography of Entrepreneurship & Immigration in the US</h1>
+    <p>Data:</p> 
+    <p><a href='https://indicators.kauffman.org/'>Kauffman Data of Entrepreneurship</a> in the US, 2004 - 2017</p>
+    
+    <!-- adding slidebar -->
+    <div class='session' id='sliderbar'>
+        <h2>Year: <label id='active-year'>2017</label></h2>
+        <input id='slider' class='row' type='range' min='2004' max='2017' step='1' value='2017' />
     </div>
-  </div>
- 
-  <div id = 'linechart'></div>
-</div>
+
+    <!-- adding radio button & legend -->
+    <div class='session'>
+        <h2>Entrepreneurship & Immigrant Share</h2>
+        <div class='row' id='filters'>
+            <p><input id='all' type='radio' name='toggle' value='all' checked='checked'>
+            <label for='all'>All</label></p>
+            <p><input id='EntreRate' type='radio' name='toggle' value='EntreRate'>
+            <label for='EntreRate'><span style="color:#fff">% Entrepreneurs in Sample Population</span></label></p>
+            <p><input id='NativeEntreRate' type='radio' name='toggle' value='NativeEntreRate'>
+            <label for='NativeEntreRate'><span style="color:#00A0B0">% Natives who are Entrepreneurs</span></label></p>
+            <p><input id='ImmiEntreRate' type='radio' name='toggle' value='ImmiEntreRate'>
+            <label for='ImmiEntreRate'><span style="color:#EDC951">% Immigrants who are Entrepreneurs</span></label></p>
+        </div>
+    </div>
+
+    <script src = "/js/map_metro.js"></script>
+    <!-- <script src = "/js/map_new.js"></script> -->
+    </div>
+
+
 
 <!-- <script src = "/js/map_metro.js"></script> -->
 <script>
@@ -134,7 +137,7 @@ map.on('load', function() {
 
     map.addSource("metroImmi", {
     type: "geojson",
-    data: "https://raw.githubusercontent.com/TianyuSu/Innovation-Immigration/master/Geojson/metroImmi04_17year.geojson",
+    data: "https://raw.githubusercontent.com/TianyuSu/Innovation-Immigration/master/Geojson/ShareEntreReverse2.geojson",
 });
 
   map.addLayer({
@@ -148,22 +151,21 @@ map.on('load', function() {
         ['number', ['get', 'RATE']],
         0, 1,
         5, 5,
-        15, 10,
-        25, 15,
-        40, 20,
-        50, 25
+        15, 15,
+        25, 20,
+        40, 30
       ],
 
       "circle-color":
     ['interpolate',
         ['linear'],
         ['number', ['get', 'variableC']],
-        1,'#AA5E79',  //     "IMMIGRate"
-        2, '#00A0B0',  //    "EntreRate"
-        3, '#EDC951' //     "ImmigOwnEntreRate"
+        1,'#EDC951',  //     "NativeEntreRate"
+        2,'#fff' ,  //    "EntreRate"
+        3,'#00A0B0'//     "ImmiEntreRate"EDC951
       ],
 
-    'circle-opacity': 0.4
+    'circle-opacity': 0.6
     },
     filter:['all',filterYear, filterVari]
   });
@@ -185,12 +187,12 @@ document.getElementById('filters').addEventListener('change', function(e) {
   // update the map filter
   if(ratevariables === 'all'){
     filterVari = ['!=', ['string', ['get', 'variable']], 'placeholder'];
-  }else if (ratevariables === "IMMIGRate") {
-    filterVari = ['match', ['get', 'variable'], ["EntreRate","ImmigOwnEntreRate"], false,true];
+  } else if (ratevariables === "ImmiEntreRate") {
+    filterVari = ['match', ['get', 'variable'], ["EntreRate","NativeEntreRate"], false, true];
+  }else if (ratevariables === "NativeEntreRate") {
+    filterVari = ['match', ['get', 'variable'], ["EntreRate","ImmiEntreRate"], false,true];
   } else if (ratevariables === 'EntreRate') {
-    filterVari = ['match', ['get', 'variable'], ["IMMIGRate","ImmigOwnEntreRate"], false, true];
-  } else if (ratevariables === "ImmigOwnEntreRate") {
-    filterVari = ['match', ['get', 'variable'], ["EntreRate","IMMIGRate"], false, true];
+    filterVari = ['match', ['get', 'variable'], ["NativeEntreRate","ImmiEntreRate"], false, true];
   } else {
     console.log('error');
   }
@@ -207,11 +209,18 @@ map.on('mouseenter', 'ImmiEntre', function(e) {
 map.getCanvas().style.cursor = 'pointer';
  
 var coordinates = e.features[0].geometry.coordinates.slice();
-var description = "In " +e.features[0].properties.year+" ,"+ e.features[0].properties.NAME + ", " + (Math.floor(e.features[0].properties.RATE*100)/100)+ "% of business owners are immigrants";
- 
-// Ensure that if the map is zoomed out such that multiple
-// copies of the feature are visible, the popup appears
-// over the copy being pointed to.
+var description = "";
+if(e.features[0].properties.variable =="ImmiEntreRate"){
+  description = "In " +e.features[0].properties.year+" ,"+ e.features[0].properties.NAME + ", " 
+  + (Math.floor(e.features[0].properties.RATE*100)/100)+ "% of immigrants are entrepreneurs."
+}else if(e.features[0].properties.variable =="EntreRate"){
+  description = "In " +e.features[0].properties.year+" ,"+ e.features[0].properties.NAME + ", " 
+  + (Math.floor(e.features[0].properties.RATE*100)/100)+ "% of residents are business owners."
+}else{
+  description = "In " +e.features[0].properties.year+" ,"+ e.features[0].properties.NAME + ", " 
+  + (Math.floor(e.features[0].properties.RATE*100)/100)+ "% of locals are entrepreneurs."
+}
+
 while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 }
@@ -234,9 +243,6 @@ map.easeTo({
 });
 
 });
-
-
-
 
 </script>
 </body>

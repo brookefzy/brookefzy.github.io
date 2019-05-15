@@ -11,7 +11,7 @@
 <script src='https://api.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
 <link href='https://api.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
 <!-- <link rel="stylesheet" type="text/css" href="/css/linechart.css"> -->
-<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+<script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
 </head>
 
 
@@ -40,7 +40,12 @@
     
     h2 {
       font-size: 14px;
-      line-height: 20px;
+      line-height: 15px;
+      margin-bottom: 10px;
+    }
+    h3 {
+      font-size: 14px;
+      margin-top:50%;
       margin-bottom: 10px;
     }
     
@@ -51,27 +56,36 @@
     
     #console {
       position: absolute;
-      width: 20%;
+      width: 25%;
       height:100%;
       margin: 10px;
       padding: 10px 20px;
       line-height: 18px;
       background-color:rgba(0, 0, 0, 0.6);
       color: white;
-      
+      float:left;
     }
+
+    .session {
+      margin-top: 15px;
+    }
+
+    .row2:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
     .container{
       position: relative;
       width: 100%;
       margin:5px
-    }
-    .session {
-      margin-bottom: 5px;
-    }
-    
+    }    
     .row {
-      height: 50px;
-      width: 100%
+      /* position:relative;
+      height: 30px; */
+      width: 100%;
+      padding:5px
     }
     
     .label {
@@ -80,6 +94,12 @@
       text-align: center;
     }
 
+    .radarChart{
+				/* position: relative; */
+				align-content: center;
+        padding: 5px;
+        width:100%;
+			}
     .mapboxgl-popup-content{
                 background:black;
                 fill-opacity: 0.5;
@@ -93,10 +113,9 @@
     }
     
     </style>
-<div id='console' >
+<div class = 'row2' id='console' >
     <h1>Geography of Entrepreneurship & Immigration in the US</h1>
-    <p>Data:</p> 
-    <p><a href='https://indicators.kauffman.org/'>Kauffman Data of Entrepreneurship</a> in the US, 2004 - 2017</p>
+    <p>Data:<a href='https://indicators.kauffman.org/'>Kauffman Data of Entrepreneurship</a> in the US, 2004 - 2017</p>
     
     <!-- adding slidebar -->
     <div class='session' id='sliderbar'>
@@ -116,42 +135,26 @@
             <label for='NativeEntreRate'><span style="color:#00A0B0">% Natives who are Entrepreneurs</span></label></p>
             <p><input id='ImmiEntreRate' type='radio' name='toggle' value='ImmiEntreRate'>
             <label for='ImmiEntreRate'><span style="color:#EDC951">% Immigrants who are Entrepreneurs</span></label></p>
-        </div>
-    </div>
-          <script src = "/js/linechart.js"></script>
-    <div class = "container" id= "chart-line1">
-
-      <script type="text/javascript">
-        d3.csv('https://raw.githubusercontent.com/TianyuSu/Innovation-Immigration/master/Data%20For%20Maps/Immi_Entre_year.csv', function(error, data) {
-        data.forEach(function (d) {
-            d.year = +d.year;
-            d.NativeEntreRate = +d.NativeEntreRate;
-            d.ImmiEntreRate = +d.ImmiEntreRate;
-            d.EntreRate = +d.Entrerate;
-
-        });
-
-        var chart = makeLineChart(data, 'year', {
-            '% of Immigrant Entrepreneurs': {column: 'ImmiEntreRate'},
-            '% of Native Entrepreneurs': {column: 'NativeEntreRate'},
-            '% of Entrepreneurs': {column: 'EntreRate'},
-
-        }, {xAxis: 'Years', yAxis: 'Percentage'});
-        chart.bind("#chart-line1");
-        chart.render();
-        });
-
-
-    </script>
+        </div>        
     </div>
 
-    <script src = "/js/map_metro.js"></script>
+    <!-- adding the STATE NAME -->
+  <div class ="session">
+      <div class ='row' id ="statename" >
+          <!-- add the radarchart -->
+        <div class ='radarChart' id ="radarChart"></div>
+    </div>
+  </div>
+
+
+</div>
+<script src = "/js/radarChart_appendix.js"></script>
+<script src = "/js/map_metro.js"></script>
+
     <!-- <script src = "/js/map_new.js"></script> -->
     </div>
 
 
-
-<!-- <script src = "/js/map_metro.js"></script> -->
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiYnJvb2tlZnp5IiwiYSI6ImNqdWFtZHNmdTA0N3o0M21oZG9peDU2NXMifQ.fbFnwmA72jGPO8IHcfEeRA';
 

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+		<title>Entrepreuneurship Industry Distribution in Each State</title>
+
+		<!-- Google fonts -->
+		<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+
+		<!-- D3.js -->
+		<script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+
+
+		<!-- <script src="/js/RadarChart.js" charset="utf-8"></script> -->
+		<style>
+			body {
+				font-family: 'Open Sans', sans-serif;
+				font-size: 11px;
+				font-weight: 300;
+				fill: white;
+				text-align: center;
+				cursor: default;
+			}
+
+			.radarChart{
+				position: relative;
+				align-content: center;
+			}
+			.legend {
+				font-family: 'Open Sans', sans-serif;
+				fill:white;
+			}
+		</style>
+	</head>
+	<body bgcolor="#030d19" align = "center">
+		<div id = "stateDropdown" align = "center"></div>
+		<div class="radarChart" align = "center" ></div>
+
+        
+		<script src="/js/radarChart.js"></script>
+
+
+		<script>
+			//////////////////////////////////////////////////////////////
+			//////////////////////// Set-Up //////////////////////////////
+			//////////////////////////////////////////////////////////////
+
+			var margin = { top: 100, right: 120, bottom: 100, left: 120 },
+					width = 400
+					height = 400
+					// width = Math.min(800, window.innerWidth / 2) - margin.left - margin.right,
+          // height = Math.min(width, window.innerHeight - margin.top - margin.bottom);
+                
+			//////////////////////////////////////////////////////////////
+			///// Chart legend, custom color, custom unit, etc. //////////
+			//////////////////////////////////////////////////////////////
+			var radarChart = {
+			  w: width,
+			  h: height,
+			  margin: margin,
+			  maxValue: 40,
+			  levels: 2,
+			  roundStrokes: false,
+			  color: d3.scaleOrdinal().range([ "#fff","#00A0B0" ,"#EDC951"]),
+				format: '.0f',
+				legend: { translateX: 140, translateY: 40 },
+				unit: '%'
+			};
+			//////////////////////////////////////////////////////////////
+			////////////////////////// Data //////////////////////////////
+			//////////////////////////////////////////////////////////////
+
+			var mydata = d3.csv("https://raw.githubusercontent.com/TianyuSu/Innovation-Immigration/master/Data_Radar/2017_radar.csv")
+       .then(function(mydata){(mydata)
+///////////////////helper function/////////////////////////////////////////
+			function formatdata(dataSelected){
+			var all = []
+			var all0 = {}
+			all0.name = "State Average";
+			all0.axes=[];
+			for (var i = 0; i<dataSelected.length; i++){
+			var row0 = {}
+			    row0.axis = dataSelected[i].industry;
+				row0.value = dataSelected[i].distr*100
+				all0.axes.push(row0)
+			}all.push(all0)
+			var all1 = {}
+			all1.name = "Native Owned Business";
+			all1.axes=[]
+			for (var i = 0; i<dataSelected.length; i++){
+			var row1 = {}
+			row1.axis = dataSelected[i].industry;
+				row1.value = dataSelected[i].distriNative*100;
+				all1.axes.push(row1)
+			}all.push(all1)
+			var all2 = {}
+			all2.name = "Immigrant Owned Business";
+
+			all2.axes=[];
+			for (var i = 0; i<dataSelected.length; i++){
+			var row2 = {}
+			row2.axis = dataSelected[i].industry;
+			row2.value = dataSelected[i].distrImmi*100;
+			all2.axes.push(row2)
+			}all.push(all2)
+
+			return all;
+			}        
+            
+            //////////////////////////////////////////////////////////////
+			////////////////////////// format data for selection //////////
+			//////////////////////////////////////////////////////////////	
+			
+                nest = d3.nest()
+                    .key(function(d){
+                        return d.State;
+                    })
+                    .entries(mydata)
+
+			//////////////////////////////////////////////////////////////
+			///// Chart dropdown menu/////////////////////////////////////
+			//////////////////////////////////////////////////////////////
+            var stateMenu = d3.select("#stateDropdown")
+                    stateMenu
+                    .append("select")
+                    .selectAll("option")
+                    .data(nest)
+                    .enter()
+                    .append("option")
+                    .attr("value", function(d){
+                        return d.key;
+                    })
+                    .text(function(d){
+                        return d.key;
+                    })
+			//////////////////////////////////////////////////////////////
+			///// inital first Chart/////////////////////////////////////
+			//////////////////////////////////////////////////////////////
+            var initialChart = function(state){
+                var selectState = nest.filter(function(d){
+                    return d.key ==state;
+                })
+            var dataSelected = selectState[0].values
+            var data = formatdata(dataSelected);
+            let svg_radar = RadarChart(".radarChart", data, radarChart);
+            }
+            ///Create Initial Chart
+            initialChart("Maine");
+
+            //update the data
+            var updateChart = function(state){
+                var selectState = nest.filter(function(d){
+                    return d.key ==state;
+                })
+            var dataSelected = selectState[0].values
+            var data = formatdata(dataSelected);
+            let svg_radar = RadarChart(".radarChart", data, radarChart);   
+            }
+
+
+ 	// Run update function when dropdown selection changes
+ 	        stateMenu.on('change', function(){
+
+
+            var selectedState = feature.properties.STATE_NAME
+// Run update function with the selected fruit
+            updateChart(selectedState)
+             });	
+		})
+		</script>
+	</body>
+</html>

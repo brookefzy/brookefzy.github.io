@@ -5,19 +5,19 @@
 // (VisualCinnamon.com) and modified for d3 v4 //////////
 /////////////////////////////////////////////////////////
 const cfg = {
-	 w: 1200,				//Width of the circle
-	 h: 1200,				//Height of the circle
-	 margin: {top: 30, right: 30, bottom: 30, left: 30}, //The margins of the SVG
+	 w: 900,				//Width of the circle
+	 h: 900,				//Height of the circle
+	 margin: {top: 2, right: 2, bottom: 2, left: 1}, //The margins of the SVG
 	 levels: 3,				//How many levels or inner circles should there be drawn
 	 maxValue: 0, 			//What is the value that the biggest circle will represent
-	 labelFactor: 1.25, 	//How much farther than the radius of the outer circle should the labels be placed
+	 labelFactor: 1.35, 	//How much farther than the radius of the outer circle should the labels be placed
 	 wrapWidth: 60, 		//The number of pixels after which a label needs to be given a new line
 	 opacityArea: 0.35, 	//The opacity of the area of the blob
-	 dotRadius: 4, 			//The size of the colored circles of each blog
+	 dotRadius: 2, 			//The size of the colored circles of each blog
 	 opacityCircles: 0.1, 	//The opacity of the circles of each blob
-	 strokeWidth: 2, 		//The width of the stroke around each blob
+	 strokeWidth: 1.5, 		//The width of the stroke around each blob
 	 roundStrokes: false,	//If true the area and stroke will follow a round path (cardinal-closed)
-	 color: d3.scaleOrdinal(d3.schemeCategory10),	//Color function,
+	//  color: d3.scaleOrdinal(d3.schemeCategory10),	//Color function,
 	 format: '.2%',
 	 unit: '',
 	 legend: false
@@ -40,7 +40,7 @@ const RadarChart = function RadarChart(parent_selector, data, options) {
 				y = text.attr("y"),
 				x = text.attr("x"),
 				dy = parseFloat(text.attr("dy")),
-				tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+				tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em").attr("fill","#fff").attr("font-size","9px");
 
 			while (word = words.pop()) {
 			  line.push(word);
@@ -49,7 +49,7 @@ const RadarChart = function RadarChart(parent_selector, data, options) {
 					line.pop();
 					tspan.text(line.join(" "));
 					line = [word];
-					tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+					tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word).attr("fill","#fff").attr("font-size","9px");
 			  }
 			}
 	  });
@@ -96,9 +96,12 @@ const RadarChart = function RadarChart(parent_selector, data, options) {
 
 	//Initiate the radar chart SVG
 	let svg = parent.append("svg")
-			.attr("width",  cfg.w + cfg.margin.left + cfg.margin.right)
-			.attr("height", cfg.h + cfg.margin.top + cfg.margin.bottom)
-			.attr("class", "radar");
+			// .attr("width",  cfg.w + cfg.margin.left + cfg.margin.right)
+			// .attr("height", cfg.h + cfg.margin.top + cfg.margin.bottom)
+			.attr("preserveAspectRatio", "xMinYMin meet")
+			.attr("viewBox", "0 0 360 360")
+			.classed("svg-content", true);
+			// .attr("class", "radar");
 
 	//Append a g element
 	let g = svg.append("g")
@@ -164,12 +167,12 @@ const RadarChart = function RadarChart(parent_selector, data, options) {
 		.attr("y2", (d, i) => rScale(maxValue* 1.1) * sin(angleSlice * i - HALF_PI))
 		.attr("class", "line")
 		.style("stroke", "white")
-		.style("stroke-width", "2px");
+		.style("stroke-width", "0.5px");
 
 	//Append the labels at each axis
 	axis.append("text")
 		.attr("class", "legend")
-		.style("font-size", "11px")
+		.style("font-size", "10px")
 		.attr("text-anchor", "middle")
 		.attr("dy", "0.35em")
 		.attr("x", (d,i) => rScale(maxValue * cfg.labelFactor) * cos(angleSlice * i - HALF_PI))
@@ -279,50 +282,51 @@ const RadarChart = function RadarChart(parent_selector, data, options) {
 		.attr("class", "tooltip")
 		.attr('x', 0)
 		.attr('y', 0)
-		.style("font-size", "12px")
+		.style("font-size", "10px")
 		.style('display', 'none')
 		.attr("text-anchor", "middle")
-		.attr("dy", "0.35em");
+		.attr("dy", "0.35em")
+		.attr("fill","#fff");
 
-	if (cfg.legend !== false && typeof cfg.legend === "object") {
-		let legendZone = svg.append('g');
-		let names = data.map(el => el.name);
-		if (cfg.legend.title) {
-			let title = legendZone.append("text")
-				.attr("class", "title")
-				.attr('transform', `translate(${cfg.legend.translateX},${cfg.legend.translateY})`)
-				.attr("x", cfg.w - 70)
-				.attr("y", 10)
-				.attr("font-size", "12px")
-				.attr("fill", "#fff")
-				.text(cfg.legend.title);
-		}
-		let legend = legendZone.append("g")
-			.attr("class", "legend")
-			.attr("height", 100)
-			.attr("width", 200)
-			.attr('transform', `translate(${cfg.legend.translateX},${cfg.legend.translateY + 20})`);
-		// Create rectangles markers
-		legend.selectAll('rect')
-		  .data(names)
-		  .enter()
-		  .append("rect")
-		  .attr("x", cfg.w - 65)
-		  .attr("y", (d,i) => i * 20)
-		  .attr("width", 10)
-		  .attr("height", 10)
-		  .style("fill", (d,i) => cfg.color(i));
-		// Create labels
-		legend.selectAll('text')
-		  .data(names)
-		  .enter()
-		  .append("text")
-		  .attr("x", cfg.w - 52)
-		  .attr("y", (d,i) => i * 20 + 9)
-		  .attr("font-size", "11px")
-		  .attr("fill", "#fff")
-		  .text(d => d);
-	}
+	// if (cfg.legend !== false && typeof cfg.legend === "object") {
+	// 	let legendZone = svg.append('g');
+	// 	let names = data.map(el => el.name);
+	// 	if (cfg.legend.title) {
+	// 		let title = legendZone.append("text")
+	// 			.attr("class", "title")
+	// 			.attr('transform', `translate(${cfg.legend.translateX},${cfg.legend.translateY})`)
+	// 			.attr("x", cfg.w - 70)
+	// 			.attr("y", 10)
+	// 			.attr("font-size", "12px")
+	// 			.attr("fill", "#fff")
+	// 			.text(cfg.legend.title);
+	// 	}
+	// 	let legend = legendZone.append("g")
+	// 		.attr("class", "legend")
+	// 		.attr("height", 100)
+	// 		.attr("width", 200)
+	// 		.attr('transform', `translate(${cfg.legend.translateX},${cfg.legend.translateY + 20})`);
+	// 	// Create rectangles markers
+	// 	legend.selectAll('rect')
+	// 	  .data(names)
+	// 	  .enter()
+	// 	  .append("rect")
+	// 	  .attr("x", cfg.w - 65)
+	// 	  .attr("y", (d,i) => i * 20)
+	// 	  .attr("width", 10)
+	// 	  .attr("height", 10)
+	// 	  .style("fill", (d,i) => cfg.color(i));
+	// 	// Create labels
+	// 	legend.selectAll('text')
+	// 	  .data(names)
+	// 	  .enter()
+	// 	  .append("text")
+	// 	  .attr("x", cfg.w - 52)
+	// 	  .attr("y", (d,i) => i * 20 + 9)
+	// 	  .attr("font-size", "11px")
+	// 	  .attr("fill", "#fff")
+	// 	  .text(d => d);
+	// }
 	return svg;
 }
 
@@ -331,11 +335,10 @@ const RadarChart = function RadarChart(parent_selector, data, options) {
 /////////////////////////////end of radar function////////////////////
 ////////////////////////////////////////////////////////////////////////
 
-var margin = { top: 100, right: 120, bottom: 100, left: 120 },
-					width = 400
-					height = 400
-					// width = Math.min(800, window.innerWidth / 2) - margin.left - margin.right,
-          // height = Math.min(width, window.innerHeight - margin.top - margin.bottom);
+var margin = { top: 60, right: 70, bottom: 60, left: 70 },
+					width = 230
+					height = 230
+
                 
 			//////////////////////////////////////////////////////////////
 			///// Chart legend, custom color, custom unit, etc. //////////
@@ -356,7 +359,7 @@ var margin = { top: 100, right: 120, bottom: 100, left: 120 },
 			////////////////////////// Data //////////////////////////////
 			//////////////////////////////////////////////////////////////
 
-			var mydata = d3.csv("https://raw.githubusercontent.com/TianyuSu/Innovation-Immigration/master/Data_Radar/2017_radar.csv")
+			var mydata = d3.csv("https://raw.githubusercontent.com/TianyuSu/Innovation-Immigration/master/Data_Radar/2017_radar_full.csv")
        .then(function(mydata){(mydata)
 ///////////////////helper function/////////////////////////////////////////
 			function formatdata(dataSelected){
@@ -429,7 +432,7 @@ var margin = { top: 100, right: 120, bottom: 100, left: 120 },
 								console.log(selectState)
             var dataSelected = selectState[0].values
             var data = formatdata(dataSelected);
-            let svg_radar = RadarChart(".radarChart", data, radarChart);
+            let svg_radar = RadarChart("div#container", data, radarChart);
             }
             ///Create Initial Chart
             initialChart("Maine");
@@ -441,19 +444,21 @@ var margin = { top: 100, right: 120, bottom: 100, left: 120 },
                 })
             var dataSelected = selectState[0].values
             var data = formatdata(dataSelected);
-            let svg_radar = RadarChart(".radarChart", data, radarChart);   
+            let svg_radar = RadarChart("div#container", data, radarChart);   
             }
             
- 	// Run update function when dropdown selection changes
- 	        stateMenu.on('change', function(){
+	 // Run update function when dropdown selection changes
+					var  selectedState = document.getElementById("statename").textContent
+					console.log(selectedState)
+ 	        // stateMenu.on('change', function(){
 
-// Find which fruit was selected from the dropdown
-            var selectedState = d3.select(this)
-                                .select("select")
-                                .property("value")
+
+          //   var selectedState = d3.select(this)
+          //                       .select("select")
+          //                       .property("value")
 
 
 // Run update function with the selected fruit
-            updateChart(selectedState)
-             });	
+            // updateChart(selectedState)
+            //  });	
 		})

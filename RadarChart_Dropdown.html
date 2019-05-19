@@ -24,7 +24,7 @@
 				cursor: default;
 			}
 
-			.radarChart{
+			#radarChart{
 				position: relative;
 				align-content: center;
 			}
@@ -36,8 +36,9 @@
 	</head>
 	<body bgcolor="#030d19" align = "center">
 		<div id = "stateDropdown" align = "center"></div>
-		<div class="radarChart" align = "center" ></div>
+		<div id="radarChart" align = "center" ></div>
 		<!-- /////style="display: inline-flex;"// -->
+		<!-- <script src = "/js/radarChart.js"></script> -->
 		<script>
 			//////////////////////////////////////////////////////////////
 			//////////////////////// Function Script /////////////////////
@@ -65,34 +66,35 @@ const max = Math.max;
 const sin = Math.sin;
 const cos = Math.cos;
 const HALF_PI = Math.PI / 2;
+const wrap = (text, width) => {
+	text.each(function() {
+		var text = d3.select(this),
+			words = text.text().split(/\s+/).reverse(),
+			word,
+			line = [],
+			lineNumber = 0,
+			lineHeight = 1.4, // ems
+			y = text.attr("y"),
+			x = text.attr("x"),
+			dy = parseFloat(text.attr("dy")),
+			tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+		while (word = words.pop()) {
+			line.push(word);
+			tspan.text(line.join(" "));
+			if (tspan.node().getComputedTextLength() > width) {
+				line.pop();
+				tspan.text(line.join(" "));
+				line = [word];
+				tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+			}
+		}
+	});
+}//wrap
 
 const RadarChart = function RadarChart(parent_selector, data, options) {
 	//Wraps SVG text - Taken from http://bl.ocks.org/mbostock/7555321
-	const wrap = (text, width) => {
-	  text.each(function() {
-			var text = d3.select(this),
-				words = text.text().split(/\s+/).reverse(),
-				word,
-				line = [],
-				lineNumber = 0,
-				lineHeight = 1.4, // ems
-				y = text.attr("y"),
-				x = text.attr("x"),
-				dy = parseFloat(text.attr("dy")),
-				tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
 
-			while (word = words.pop()) {
-			  line.push(word);
-			  tspan.text(line.join(" "));
-			  if (tspan.node().getComputedTextLength() > width) {
-					line.pop();
-					tspan.text(line.join(" "));
-					line = [word];
-					tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
-			  }
-			}
-	  });
-	}//wrap
 
 
 	//Put all of the options into a variable called cfg
@@ -468,7 +470,7 @@ const RadarChart = function RadarChart(parent_selector, data, options) {
                 })
             var dataSelected = selectState[0].values
             var data = formatdata(dataSelected);
-            let svg_radar = RadarChart(".radarChart", data, radarChart);
+            let svg_radar = RadarChart("#radarChart", data, radarChart);
             }
             ///Create Initial Chart
             initialChart("Maine");
@@ -480,7 +482,7 @@ const RadarChart = function RadarChart(parent_selector, data, options) {
                 })
             var dataSelected = selectState[0].values
             var data = formatdata(dataSelected);
-            let svg_radar = RadarChart(".radarChart", data, radarChart);   
+            let svg_radar = RadarChart("#radarChart", data, radarChart);   
             }
             
  	// Run update function when dropdown selection changes
